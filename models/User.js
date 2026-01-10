@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const { Schema,model} = mongoose;
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     id:{
         type:String,
         unique:true,
@@ -44,5 +44,5 @@ UserSchema.methods.toJSON = function() {
     return user; 
 }
 
-const UserModel = mongoose.model('User', userSchema);
-export default UserModel;
+const userModel = mongoose.model('User', userSchema);
+export default userModel;
