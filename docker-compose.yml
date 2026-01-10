@@ -1,0 +1,28 @@
+
+services:
+  mongo:
+    image: mongo:7.0   # Última versión estable
+    container_name: mongo_db
+    restart: always
+    ports:
+      - "27018:27017"
+    environment:
+      # MONGO_INITDB_ROOT_USERNAME: 
+      # MONGO_INITDB_ROOT_PASSWORD: 
+      MONGO_INITDB_DATABASE: ejemplo
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    build: .
+    container_name: node_app
+    restart: always
+    ports:
+      - "9090:9090"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
