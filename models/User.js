@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const { Schema,model} = mongoose;
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
     id:{
         type:String,
         unique:true,
@@ -39,10 +39,10 @@ const userSchema = new mongoose.Schema({
 
 //metodo para limpiar el objeto al devolverlo (por seguridad)
 //para no enviar por ejemplo contraseñas encriptada ya que seria un fallo grande
-UserSchema.methods.toJSON = function() {
-    const {versionKey,_id,password,...user} = this.toObject();
+userSchema.methods.toJSON = function() {
+    const {_v,_id,password,...user} = this.toObject();
     return user; 
 }
 
-const userModel = mongoose.model('User', userSchema);
-export default userModel;
+
+export default model('User',userSchema);

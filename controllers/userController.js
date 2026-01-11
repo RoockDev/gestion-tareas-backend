@@ -6,7 +6,7 @@ const userController = {
      * POST /api/users
      */
 
-    createUser: async (req,res) => {
+    createUser: async (req = request,res=response) => {
         try{
             const body = req.body;
 

@@ -10,13 +10,27 @@ class UserService {
     try {
       const { name, email, password, roles } = userData;
 
-      const user = new User({
+      console.log("Roles recibidos de servie", roles);
+
+      const user = {
         id: uuidv4(),
         name,
         email,
         password,
-        roles,
-      });
+      };
+
+      /**Esta solucion de debajo hay que ponerla porque aunque se haya puesto por defecto de rol user
+       * si no se le pasa rol por el body siempre devuelve undefined y no se guarda en la base de datos
+       * por eso hay que hacer este codigo de aqui debajo para conseguir que se guarde
+       */
+
+      if (roles) {
+        user.roles = roles;
+      }
+
+      const newUser = new User(user);
+
+      console.log("2. Usuario Mongoose antes de save:", user);
 
 
       //esto es por darle un poco mas de seguridad, por si dos usuarios tienen la misma contraseña
@@ -25,13 +39,13 @@ class UserService {
       const salt =  await bcryptjs.genSalt(); 
       user.password = await bcryptjs.hash(password, salt);
 
-      await user.save();
+      await newUser.save();
 
       console.log(
         kleur.blue().bold("   usuario creado correctamente: ") + user.email
       );
 
-      return user;
+      return newUser;
     } catch (error) {
       console.log(kleur.red().bold("Error al crear usuario: "));
       console.log(error);

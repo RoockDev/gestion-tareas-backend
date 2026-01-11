@@ -1,0 +1,9 @@
+###Crear un nuevo usuario
+POST http://localhost:9090/api/users
+Content-Type: application/json
+
+{
+    "name": "Anakin",
+    "email": "Anakin@darth.com",
+    "password": "obipadme"
+}

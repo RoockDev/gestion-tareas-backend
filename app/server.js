@@ -3,6 +3,8 @@ import cors from 'cors';
 import {createServer} from 'http';
 import {Server as SocketServer} from 'socket.io';
 import kleur from 'kleur';
+import userRoutes from '../routes/userRoutes.js';
+import { dbConnection } from '../services/config.js';
 
 class Server {
     constructor() {
@@ -36,7 +38,7 @@ class Server {
 
     async conectarDB() {
         //TODO se conectara con mongo despues
-        console.log(kleur.blue('conexion con mongo pendiente de implementar'));
+        await dbConnection();
     }
 
     middlewares(){
@@ -48,11 +50,12 @@ class Server {
         this.app.use(express.json() );
 
         //directorio publico
-        this.app.use(exxpress.static('public'));
+        this.app.use(express.static('public'));
     }
 
     routes() {
         //TODO aqui se definiran las rutas
+        this.app.use(this.paths.users,userRoutes);
     }
 
     sockets(){
