@@ -7,3 +7,12 @@ Content-Type: application/json
     "email": "Anakin@darth.com",
     "password": "obipadme"
 }
+
+### Login de usuario
+POST http://localhost:9090/api/auth/login 
+Content-Type: application/json
+
+{
+    "email": "Anakin@darth.com",
+    "password": "obipadme"
+}

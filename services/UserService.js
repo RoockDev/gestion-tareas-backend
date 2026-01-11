@@ -37,7 +37,7 @@ class UserService {
       //que se encrypte de manera distinta, si no lo pones si dos usuarios tienen la misma contraseña
       //con hash solo , en bbdd tendrian la misma encriptacion
       const salt =  await bcryptjs.genSalt(); 
-      user.password = await bcryptjs.hash(password, salt);
+      newUser.password = await bcryptjs.hash(password, salt);
 
       await newUser.save();
 
