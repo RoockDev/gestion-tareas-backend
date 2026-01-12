@@ -3,9 +3,9 @@ POST http://localhost:9090/api/users
 Content-Type: application/json
 
 {
-    "name": "Anakin",
-    "email": "Anakin@darth.com",
-    "password": "obipadme"
+    "name": "sergio",
+    "email": "sergio@sergio.com",
+    "password": "aaaaaaaa"
 }
 
 ### Login de usuario
@@ -13,6 +13,21 @@ POST http://localhost:9090/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "Anakin@darth.com",
-    "password": "obipadme"
+    "email": "sergio@sergio.com",
+    "password": "aaaaaaaa"
 }
+
+###Crear Tarea (ADMIN)
+POST http://localhost:9090/api/tasks
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlZjAxNzkzNC02N2VmLTQ5YjQtOWVjNS1hYzRhMjdkNTE3ZGEiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MjM0ODQ0LCJleHAiOjE3NjgyNDkyNDR9.gMpswwJQ1bkMCTQpZBFqYI-WfR6OiGen7-ZIT5vKT0I
+
+{
+    "description": "limpiar los motores de la nava",
+    "duration": 2,
+    "difficulty": "M"
+}
+
+### Obtener Tareas
+GET http://localhost:9090/api/tasks
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlZjAxNzkzNC02N2VmLTQ5YjQtOWVjNS1hYzRhMjdkNTE3ZGEiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MjM0ODQ0LCJleHAiOjE3NjgyNDkyNDR9.gMpswwJQ1bkMCTQpZBFqYI-WfR6OiGen7-ZIT5vKT0I

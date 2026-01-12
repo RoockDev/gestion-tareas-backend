@@ -5,6 +5,7 @@ import {Server as SocketServer} from 'socket.io';
 import kleur from 'kleur';
 import userRoutes from '../routes/userRoutes.js';
 import authRoutes from '../routes/authRoutes.js';
+import taskRoutes from '../routes/taskRoutes.js';
 import { dbConnection } from '../services/config.js';
 
 class Server {
@@ -38,7 +39,7 @@ class Server {
     }
 
     async conectarDB() {
-        //TODO se conectara con mongo despues
+      
         await dbConnection();
     }
 
@@ -55,11 +56,12 @@ class Server {
     }
 
     routes() {
-        //TODO aqui se definiran las rutas
         //crear usuario
         this.app.use(this.paths.users,userRoutes);
         //login
         this.app.use(this.paths.auth,authRoutes);
+        //listar tareas y crear tareas
+        this.app.use(this.paths.tasks,taskRoutes);
     }
 
     sockets(){

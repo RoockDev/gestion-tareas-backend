@@ -1,7 +1,7 @@
 import {response, request} from 'express';
 import {validationResult} from 'express-validator';
 
-const validateFields = (req,res,next) => {
+const validateFields = (req = request,res=response,next) => {
     //validationResult extrae los errores acumulados por los check de la ruta
     const errors = validationResult(req);
 
