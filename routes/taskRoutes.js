@@ -3,7 +3,7 @@ import {check} from 'express-validator';
 import {validateFields} from '../middlewares/validateFields.js';
 import {validateJWT} from '../middlewares/validate-jwt.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
-import {createTask,getTasks} from '../controllers/taskController.js';
+import {createTask,getTasks,assignTask} from '../controllers/taskController.js';
 
 const router = Router();
 
@@ -30,5 +30,19 @@ router.post('/',[
     check('difficulty','La dificultad es obligatoria').isIn(['XS','S','M','L','XL']),
     validateFields
 ],createTask);
+
+/**
+ * Asignar tarea a usuario
+ * acceso : Admin
+ * PATCH porque modificamos una parte del recurso (assignedTo y status)
+ */
+router.patch('/:id/assign', [
+    validateJWT,
+    isAdmin,
+    check('id', 'No es un id de tarea valido').isMongoId(),
+    check('userId', 'No es un id de usuario valido').isMongoId(),
+    check('userId', 'El userId es obligatorio').not().isEmpty(),
+    validateFields
+],assignTask);
 
 export default router;

@@ -1,52 +1,90 @@
 import {response, request} from 'express';
-import Task from '../models/Task.js';
+import TaskService from '../services/TaskService.js';
 
-//Obtener todas las tareas
+const taskService = new TaskService();
+
 const getTasks = async (req = request, res = response) => {
     try {
-        // .populate('assignedTo') -> Va a la colección Users y trae los datos del dueño
-        const tasks = await Task.find().populate('assignedTo', 'name email') ;
-        
+        const tasks = await taskService.getTasks();
+
         return res.status(200).json({
-            success:true,
+            success: true,
             message: 'Listado de tareas obtenido correctamente',
             data:tasks
         });
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             success:false,
-            message: 'Error al obtener tareas',
+            message: 'Error al obtener las tareas',
             data:null
         });
     }
 }
 
-
-//crear una nueva tarea
 const createTask = async (req = request, res = response) => {
     try {
-        const {description,duration,difficulty} = req.body;
-
-        const newTask = new Task({
-            description,
-            duration,
-            difficulty
-        });
-
-        await newTask.save();
+        //se le pasa el body entero
+        const newTask = await taskService.createTask(req.body);
 
         return res.status(201).json({
             success:true,
             message: 'Tarea creada con exito',
-            data:newTask
+            data: newTask
         });
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             success:false,
-            message:'Error al crear la tarea',
+            message: 'Error al crear la tarea',
+            data:null
+        });
+    }
+}
+
+const assignTask = async (req = request, res = response) => {
+    const { id } = req.params; //id tarea
+    const {userId} = req.body;
+
+    try {
+       const taskWithUser = await taskService.assignTask(id,userId);
+       
+       return res.status(200).json({
+        success:true,
+        message: 'Tarea asignada correctamente',
+        data: taskWithUser
+       });
+    } catch (error) {
+        console.log(error);
+
+        //manejo de errores especificos definidos en el servicio
+        if (error.message === 'TASK_NOT_FOUND') {
+            return res.status(404).json({
+                success:false,
+                message: 'La tarea no existe',
+                data:null
+            });
+        }
+
+        if (error.message === 'USER_NOT_FOUND') {
+            return res.status(404).json({
+                success:false,
+                message: 'El usuario no existe',
+                data:null
+            });
+        }
+
+        if (error.message) {
+            return res.status(400).json({
+                success:false,
+                message: 'La tarea ya está asignada',
+                data:null
+            });
+        }
+
+        return res.status(500).json({
+            success:false,
+            message: 'Error al asignar tarea',
             data:null
         });
     }
@@ -54,5 +92,6 @@ const createTask = async (req = request, res = response) => {
 
 export {
     getTasks,
-    createTask
+    createTask,
+    assignTask
 }

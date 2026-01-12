@@ -29,7 +29,7 @@ const userSchema = new Schema({
         type:Boolean,
         default:true
     },
-    task: [{
+    tasks: [{
         type: Schema.Types.ObjectId,
         ref: 'task'
     }]
