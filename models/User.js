@@ -28,7 +28,11 @@ const userSchema = new Schema({
     state:{ //para el softdelete
         type:Boolean,
         default:true
-    }
+    },
+    task: [{
+        type: Schema.Types.ObjectId,
+        ref: 'task'
+    }]
 },
 {
     collection: 'users',
