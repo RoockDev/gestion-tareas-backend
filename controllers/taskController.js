@@ -134,9 +134,55 @@ const changeStatus = async (req = request, res = response) => {
     });
 }
 
+const releaseTask = async (req = request, res = response) => {
+    const {id} = req.params;
+    const user = req.user;
+
+    try {
+        const releasedTask = await taskService.releaseTask(id,user);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Tarea liberada, Está disponible de nuevo',
+            data: releasedTask
+        })
+    } catch (error) {
+        if (error.message === 'TASK_NOT_FOUND') {
+            return res.status(404).json({
+                success:false,
+                message: 'Tarea no existe',
+                data:null
+            });
+        }
+
+        if (error.message === 'TASK_NOT_ASSIGNED') {
+            return res.status(400).json({
+                success:false,
+                message: 'La tarea no está asignada a nadie, no se puede liberar',
+                data: null
+            });
+        }
+
+        if (error.message === 'NOT_AUTHORIZED') {
+            return res.status(403).json({
+                success:false,
+                message: 'No tienes permisos para liberar esta tarea',
+                data:null
+            });
+        }
+    }
+
+    return res.status(500).json({
+        success:false,
+        message: 'Error inesperado',
+        data:null
+    });
+}
+
 export {
     getTasks,
     createTask,
     assignTask,
-    changeStatus
+    changeStatus,
+    releaseTask
 }

@@ -105,6 +105,43 @@ class TaskService {
             throw error;
         }
     }
+
+    //liberar una tarea
+    async releaseTask(taskId,user){
+        try {
+            const task = await Task.findById(taskId);
+            if (!task) {
+                throw new Error('TASK_NOT_FOUND');
+            }
+
+            //se comprueba si está asignada
+            if (!task.assignedTo) {
+                throw new Error('TASK_NOT_ASSIGNED');
+            }
+
+            //se valida si es admin o usuario normal
+            const isAdmin = user.roles.includes('ADMIN_ROLE');
+            const isOwner = task.assignedTo && task.assignedTo.toString() === user._id.toString();
+
+            if (!isAdmin && !isOwner) {
+                throw new Error('NOT_AUTHORIZED');
+            }
+
+            //ahora se saca la tarea del array con pull, se busca al usuario que tenia asignada y se le quita
+            await User.findByIdAndUpdate(task.assignedTo, {
+                $pull: {tasks: task._id}
+            });
+
+            // ahora en tarea se deben de resetear los campos que la vinculaban con el user y el nuevo estado por supuesto
+            task.assignedTo = null;
+            task.status = 'todo';
+            await task.save();
+
+            return task;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default TaskService;

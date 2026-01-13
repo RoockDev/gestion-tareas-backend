@@ -53,9 +53,10 @@ x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2
 }
 
 ### Cambiar estado de tarea a DOING  (debe permitir)
-PATCH http://localhost:9090/api/tasks/69651f10c70debe569b07a88/status
+PATCH http://localhost:9090/api/tasks/696678c49cc53ddaad0013cf/status
 Content-Type: application/json
-x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlZjAxNzkzNC02N2VmLTQ5YjQtOWVjNS1hYzRhMjdkNTE3ZGEiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzIyOTU5LCJleHAiOjE3NjgzMzczNTl9.DE8aZFE8_wMPE9K5CiAbNT7otink6co-PABlH0ytpPc
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMzYtYmI2ZC05NDNhZjUzODIwMDIiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzI2NzE3LCJleHAiOjE3NjgzNDExMTd9.qqh_3_zwM-TcpIIJ4OxEq12TCOlubDu3hScLWHv5rb8
+  
 
 {
     "status":"doing"
@@ -71,3 +72,11 @@ x-token: eyJhbGciOiJIUzI1NiIdsfsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ
 {
     "status":"doing"
 }
+
+
+### Liberar tarea
+PATCH http://localhost:9090/api/tasks/696678c49cc53ddaad0013cf/release
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMzYtYmI2ZC05NDNhZjUzODIwMDIiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzI3MDcyLCJleHAiOjE3NjgzNDE0NzJ9.TLad11Z4njIQF5ludlSJkyTktjnupgyY0-rIVeDO19s
+
+

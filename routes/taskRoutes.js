@@ -3,7 +3,7 @@ import {check} from 'express-validator';
 import {validateFields} from '../middlewares/validateFields.js';
 import {validateJWT} from '../middlewares/validate-jwt.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
-import {createTask,getTasks,assignTask,changeStatus} from '../controllers/taskController.js';
+import {createTask,getTasks,assignTask,changeStatus,releaseTask} from '../controllers/taskController.js';
 
 const router = Router();
 
@@ -47,7 +47,7 @@ router.patch('/:id/assign', [
 
 /**
  * Cambiar estado de tarea
- * acceso: privado (tiene que ser usuario con token o admin )
+ * acceso: privado (tiene que ser usuario o admin )
  */
 router.patch('/:id/status',[
     validateJWT,
@@ -56,5 +56,15 @@ router.patch('/:id/status',[
     check('status','Estado no válido').isIn(['todo','doing','done']),
     validateFields
 ],changeStatus);
+
+/**
+ * Liberar una tarea
+ * access: privado (tiene que ser usuario o admin)
+ */
+router.patch('/:id/release', [
+    validateJWT,
+    check('id', 'No es un id valido').isMongoId(),
+    validateFields
+],releaseTask);
 
 export default router;
