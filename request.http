@@ -84,3 +84,15 @@ x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMz
 PATCH http://localhost:9090/api/tasks/69668fcfc9552fa12b870ecc/take
 Content-Type: application/json
 x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMzYtYmI2ZC05NDNhZjUzODIwMDIiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzI3MDcyLCJleHAiOjE3NjgzNDE0NzJ9.TLad11Z4njIQF5ludlSJkyTktjnupgyY0-rIVeDO19s
+
+
+
+### Eliminar Tarea como Admin (debe funcionar)
+DELETE http://localhost:9090/api/tasks/69668fcfc9552fa12b870ecc
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2MtOTUxMC03MmE0MGVkNTJhYTgiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIl0sImlhdCI6MTc2ODMzOTY2NiwiZXhwIjoxNzY4MzU0MDY2fQ.oLRKIPDSaMplsxu2f2Ygr0KFXnUeUSXW94ueJRDsDeE
+
+
+### Eliminar Tarea como User (debe fallar)
+DELETE http://localhost:9090/api/tasks/696678c49cc53ddaad0013cf
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMzYtYmI2ZC05NDNhZjUzODIwMDIiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzM5NzU1LCJleHAiOjE3NjgzNTQxNTV9.VHab5Z6-Ound2SFF6fpRZM7ZtWF24ySQNCjKAlCbbGA

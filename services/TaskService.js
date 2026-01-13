@@ -177,6 +177,33 @@ class TaskService {
       throw error;
     }
   }
+//borrar tarea - solo admin
+async deleteTask(taskId,user){
+    try {
+        const task = await Task.findById(taskId);
+        if (!task) {
+            throw new Error('TASK_NOT_FOUND');
+        }
+
+        //aunque lo protejamos con el middleware, aqui tambien lo hago + seguridad
+        if (!user.roles.includes('ADMIN_ROLE')) {
+            throw new Error('NOT_AUTHORIZED');
+        }
+
+        if (task.assignedTo) {
+            await User.findByIdAndUpdate(task.assignedTo,{
+                $pull: {tasks: task._id}
+            });
+        }
+
+        await task.deleteOne();
+    } catch (error) {
+        throw error;
+    }
 }
+
+}
+
+
 
 export default TaskService;

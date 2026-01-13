@@ -223,11 +223,50 @@ const takeTask = async (req = request, res = response) => {
         data:null
     })
 }
+
+//deletear tarea -solo admin
+const deleteTask = async (req = request, res = response) => {
+    const { id } = req.params;
+    const user = req.user;
+
+    try {
+        await taskService.deleteTask(id,user);
+        return res.status(200).json({
+            success:true,
+            message: 'Tarea eliminada permanentemente',
+            data:null // no se devuelven datos por que ya no existe y tampoco es necesario
+        })
+    } catch (error) {
+        console.log(error);
+
+        if (error.message === 'TASK_NOT_FOUND') {
+            return res.status(404).json({
+                success:false,
+                message: 'La tarea no existe',
+                data:null
+            });
+        }
+        if (error.message === 'NOT_AUTHORIZED') {
+            return res.status(403).json({
+                success:false,
+                message: 'No tienes permiso para eliminar una tarea',
+                data:null
+            });
+        }
+    }
+
+    return res.status(500).json({
+        success:false,
+        message: 'Error inesperado',
+        data:null
+    });
+}
 export {
     getTasks,
     createTask,
     assignTask,
     changeStatus,
     releaseTask,
-    takeTask
+    takeTask,
+    deleteTask
 }

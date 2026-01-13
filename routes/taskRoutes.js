@@ -3,7 +3,7 @@ import {check} from 'express-validator';
 import {validateFields} from '../middlewares/validateFields.js';
 import {validateJWT} from '../middlewares/validate-jwt.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
-import {createTask,getTasks,assignTask,changeStatus,releaseTask,takeTask} from '../controllers/taskController.js';
+import {createTask,getTasks,assignTask,changeStatus,releaseTask,takeTask, deleteTask} from '../controllers/taskController.js';
 
 const router = Router();
 
@@ -76,5 +76,17 @@ router.patch('/:id/take', [
     check('id', 'No es un id valido').isMongoId(),
     validateFields
 ],takeTask)
+
+/**
+ * Eliminar tarea
+ * access: solo admin
+ */
+
+router.delete('/:id',[
+    validateJWT,
+    isAdmin,
+    check('id', 'No es un id válido').isMongoId(),
+    validateFields
+],deleteTask);
 
 export default router;
