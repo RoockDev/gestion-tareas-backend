@@ -3,6 +3,7 @@ import TaskService from '../services/TaskService.js';
 
 const taskService = new TaskService();
 
+//Obtener todas las tareas
 const getTasks = async (req = request, res = response) => {
     try {
         const tasks = await taskService.getTasks();
@@ -22,6 +23,7 @@ const getTasks = async (req = request, res = response) => {
     }
 }
 
+//Crear Tarea
 const createTask = async (req = request, res = response) => {
     try {
         //se le pasa el body entero
@@ -42,6 +44,7 @@ const createTask = async (req = request, res = response) => {
     }
 }
 
+//Asignar Tareas - Solo Admin
 const assignTask = async (req = request, res = response) => {
     const { id } = req.params; //id tarea
     const {userId} = req.body;
@@ -90,6 +93,7 @@ const assignTask = async (req = request, res = response) => {
     }
 }
 
+//Cambiar estado de una tarea
 const changeStatus = async (req = request, res = response) => {
     const {id} = req.params;
     const {status} = req.body;
@@ -134,6 +138,7 @@ const changeStatus = async (req = request, res = response) => {
     });
 }
 
+//Liberar una tarea
 const releaseTask = async (req = request, res = response) => {
     const {id} = req.params;
     const user = req.user;
@@ -179,10 +184,50 @@ const releaseTask = async (req = request, res = response) => {
     });
 }
 
+
+//autoasignar una tarea - cualquier usuario logeado
+const takeTask = async (req = request, res = response) => {
+    const {id} = req.params;
+    const user = req.user; 
+
+    try {
+        const task = await taskService.takeTask(id,user);
+        return res.status(200).json({
+            success:true,
+            message: 'Tarea auto-asignada correctamente',
+            data: task
+        });
+    } catch (error) {
+        console.log(error);
+        if (error.message === 'TASK_NOT_FOUND') {
+            return res.status(404).json({
+                success:false,
+                message: ' la tarea no existe',
+                data: null
+            });
+        }
+
+        if (error.message === 'TASK_ALREADY_ASSIGNED') {
+            return res.status(400).json({
+                success:false,
+                message: 'La tarea ya esta asignada',
+                data: null
+            });
+        }
+
+    }
+
+    return res.status(500).json({
+        success:false,
+        message: 'Error inesperado',
+        data:null
+    })
+}
 export {
     getTasks,
     createTask,
     assignTask,
     changeStatus,
-    releaseTask
+    releaseTask,
+    takeTask
 }

@@ -3,7 +3,7 @@ import {check} from 'express-validator';
 import {validateFields} from '../middlewares/validateFields.js';
 import {validateJWT} from '../middlewares/validate-jwt.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
-import {createTask,getTasks,assignTask,changeStatus,releaseTask} from '../controllers/taskController.js';
+import {createTask,getTasks,assignTask,changeStatus,releaseTask,takeTask} from '../controllers/taskController.js';
 
 const router = Router();
 
@@ -66,5 +66,15 @@ router.patch('/:id/release', [
     check('id', 'No es un id valido').isMongoId(),
     validateFields
 ],releaseTask);
+
+/**
+ * Auto-asignar una tarea 
+ * access: privado (cualquier usuario logeado)
+ */
+router.patch('/:id/take', [
+    validateJWT,
+    check('id', 'No es un id valido').isMongoId(),
+    validateFields
+],takeTask)
 
 export default router;

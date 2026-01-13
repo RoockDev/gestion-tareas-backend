@@ -142,6 +142,41 @@ class TaskService {
             throw error;
         }
     }
+
+    //autoasignar tarea, el usuario coge una tarea que tenga libre
+    // ... métodos anteriores ...
+
+  
+  async takeTask(taskId, user) {
+    try {
+     
+      const task = await Task.findById(taskId);
+      if (!task) {
+        throw new Error('TASK_NOT_FOUND');
+      }
+
+      
+      if (task.assignedTo) {
+        throw new Error('TASK_ALREADY_ASSIGNED');
+      }
+
+      
+      task.assignedTo = user._id;
+      task.status = 'todo'; 
+      await task.save();
+
+     
+      await User.findByIdAndUpdate(user._id, {
+        $push: { tasks: task._id }
+      });
+
+      // E. Devolvemos la tarea populada
+      return await Task.findById(taskId).populate('assignedTo', 'name email');
+
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default TaskService;

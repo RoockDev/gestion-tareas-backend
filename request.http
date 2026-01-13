@@ -34,7 +34,7 @@ Content-Type: application/json
 x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2MtOTUxMC03MmE0MGVkNTJhYTgiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIl0sImlhdCI6MTc2ODMyMzIyNiwiZXhwIjoxNzY4MzM3NjI2fQ.e4OdTGxk4o0gEFI626x0AZlP5h9GMQfwkKWIKx2Uc_M
 
 {
-    "description": "Tarea de user Sergio",
+    "description": "Tarea para probar ruta takeee",
     "duration": 2,
     "difficulty": "XL"
 }
@@ -80,3 +80,7 @@ Content-Type: application/json
 x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMzYtYmI2ZC05NDNhZjUzODIwMDIiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzI3MDcyLCJleHAiOjE3NjgzNDE0NzJ9.TLad11Z4njIQF5ludlSJkyTktjnupgyY0-rIVeDO19s
 
 
+### Auto-asignar una tarea takeTask
+PATCH http://localhost:9090/api/tasks/69668fcfc9552fa12b870ecc/take
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMzYtYmI2ZC05NDNhZjUzODIwMDIiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzI3MDcyLCJleHAiOjE3NjgzNDE0NzJ9.TLad11Z4njIQF5ludlSJkyTktjnupgyY0-rIVeDO19s
