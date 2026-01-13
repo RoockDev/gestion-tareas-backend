@@ -90,8 +90,53 @@ const assignTask = async (req = request, res = response) => {
     }
 }
 
+const changeStatus = async (req = request, res = response) => {
+    const {id} = req.params;
+    const {status} = req.body;
+    const user = req.user;
+
+    try {
+        const updatedTask = await taskService.changeStatus(id,status,user);
+        return res.status(200).json({
+            success:true,
+            message: `Estado actualizado a ${status}`,
+            data: updatedTask
+        });
+    } catch (error) {
+        console.log(error);
+        if (error.message === 'TASK_NOT_FOUND') {
+            return res.status(404).json({
+                success:false,
+                message: 'La tarea no existe',
+                data:null
+            });
+        }
+        if (error.message === 'NOT_AUTHORIZED') {
+            return res.status(403).json({
+                success:false,
+                message: 'No tienes permisos',
+                data:null
+            });
+        }
+        if (error.message === 'INVALID_TRANSITION') {
+            return res.status(400).json({
+                success:false,
+                message: 'Cambio de estado no permitido',
+                data:null
+            })
+        }
+    }
+
+    return res.status(500).json({
+        success:false,
+        message: 'Error inesperado',
+        data:null
+    });
+}
+
 export {
     getTasks,
     createTask,
-    assignTask
+    assignTask,
+    changeStatus
 }

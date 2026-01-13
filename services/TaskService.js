@@ -64,6 +64,47 @@ class TaskService {
             throw error;
         }
     }
+
+    //cambiar estado de una tarea
+    async changeStatus(taskId, newStatus,user){
+        try {
+            const task = await Task.findById(taskId);
+            if (!task) {
+                throw new Error('TASK_NOT_FOUND');
+            }
+            //ahora se comprueba si es admin o user el que la cambia
+            //se podria hacer mediante dos middleware pero seria mas ineficiente porque habria 
+            //que hacer dos consultas a la base de datos, de esta forma con una se hace y se utiliza solo el middeware de JWT
+            const isAdmin = user.roles.includes('ADMIN_ROLE');
+            const isOwner = task.assignedTo && task.assignedTo.toString() === user._id.toString();
+            //esto es para que el servidor no pete en caso de que la tarea en assignTo sea null
+            //si ponemos solo task.assignedTo.toString() y resulta que es null (null.toString()) el servidor
+            //revienta, por lo tanto con el && en caso de que sea null aseguramos que no siga hacia la derecha
+
+            
+            if (!isAdmin && !isOwner) {
+                throw new Error('NOT_AUTHORIZED');
+            }
+
+            //se verifica el estado actual
+            const currentStatus = task.status;
+
+            if (currentStatus === 'todo' && newStatus === 'doing') {
+                task.status = 'doing';
+            }else if(currentStatus === 'doing' && newStatus === 'done'){
+                task.status = 'done';
+            }else if(currentStatus !== 'todo' && newStatus === 'todo'){
+                task.status = 'todo';
+            }else{
+                throw new Error('INVALID_TRANSITION');
+            }
+
+            await task.save();
+            return task;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default TaskService;

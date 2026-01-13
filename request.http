@@ -8,7 +8,7 @@ Content-Type: application/json
     "password": "aaaaaaaa"
 }
 
-### Login de usuario
+### Login de usuario Admin
 POST http://localhost:9090/api/auth/login 
 Content-Type: application/json
 
@@ -17,26 +17,57 @@ Content-Type: application/json
     "password": "obipadme"
 }
 
+
+### Login de usuario normal
+POST http://localhost:9090/api/auth/login 
+Content-Type: application/json
+
+{
+    "email": "sergio@sergio.com",
+    "password": "aaaaaaaa"
+}
+
+
 ###Crear Tarea (ADMIN)
 POST http://localhost:9090/api/tasks
 Content-Type: application/json
-x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2MtOTUxMC03MmE0MGVkNTJhYTgiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIl0sImlhdCI6MTc2ODI0MTg1MSwiZXhwIjoxNzY4MjU2MjUxfQ.3EOl3MtUe-Dwup8lhMSWXlZLFko1OKh14vukbEuKCmw
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2MtOTUxMC03MmE0MGVkNTJhYTgiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIl0sImlhdCI6MTc2ODMyMzIyNiwiZXhwIjoxNzY4MzM3NjI2fQ.e4OdTGxk4o0gEFI626x0AZlP5h9GMQfwkKWIKx2Uc_M
 
 {
-    "description": "Vivir",
+    "description": "Tarea de user Sergio",
     "duration": 2,
     "difficulty": "XL"
 }
 
 ### Obtener Tareas
 GET http://localhost:9090/api/tasks
-x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlZjAxNzkzNC02N2VmLTQ5YjQtOWVjNS1hYzRhMjdkNTE3ZGEiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MjM0ODQ0LCJleHAiOjE3NjgyNDkyNDR9.gMpswwJQ1bkMCTQpZBFqYI-WfR6OiGen7-ZIT5vKT0I
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2MtOTUxMC03MmE0MGVkNTJhYTgiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIl0sImlhdCI6MTc2ODMyMzIyNiwiZXhwIjoxNzY4MzM3NjI2fQ.e4OdTGxk4o0gEFI626x0AZlP5h9GMQfwkKWIKx2Uc_M
 
 ### Asignar Tarea (ADMIN)
-PATCH http://localhost:9090/api/tasks/69651f10c70debe569b07a88/assign
+PATCH http://localhost:9090/api/tasks/696678c49cc53ddaad0013cf/assign
 Content-Type: application/json
-x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2MtOTUxMC03MmE0MGVkNTJhYTgiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIl0sImlhdCI6MTc2ODI0MTg1MSwiZXhwIjoxNzY4MjU2MjUxfQ.3EOl3MtUe-Dwup8lhMSWXlZLFko1OKh14vukbEuKCmw
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2MtOTUxMC03MmE0MGVkNTJhYTgiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIl0sImlhdCI6MTc2ODMyMzIyNiwiZXhwIjoxNzY4MzM3NjI2fQ.e4OdTGxk4o0gEFI626x0AZlP5h9GMQfwkKWIKx2Uc_M
 
 {
-    "userId": "69641fc5c3fd4182e558c38e"
+    "userId": "696678809cc53ddaad0013cb"
+}
+
+### Cambiar estado de tarea a DOING  (debe permitir)
+PATCH http://localhost:9090/api/tasks/69651f10c70debe569b07a88/status
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlZjAxNzkzNC02N2VmLTQ5YjQtOWVjNS1hYzRhMjdkNTE3ZGEiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzIyOTU5LCJleHAiOjE3NjgzMzczNTl9.DE8aZFE8_wMPE9K5CiAbNT7otink6co-PABlH0ytpPc
+
+{
+    "status":"doing"
+}
+
+
+
+### Cambiar estado de tarea a DOING con token no valido (debe fallar)
+PATCH http://localhost:9090/api/tasks/69651f10c70debe569b07a88/status
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIdsfsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2MtOTUxMC03MmE0MGVkNTJhYTgiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIl0sImlhdCI6MTc2ODMyMDY3NCwiZXhwIjoxNzY4MzM1MDc0fQ.D08YAnVhz7GffdFjgKzKkdRMbtADcwBHfSliLFL5GTo
+
+{
+    "status":"doing"
 }

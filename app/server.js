@@ -56,11 +56,11 @@ class Server {
     }
 
     routes() {
-        //crear usuario
+        //user routes
         this.app.use(this.paths.users,userRoutes);
-        //login
+        //auth routes
         this.app.use(this.paths.auth,authRoutes);
-        //listar tareas y crear tareas
+        //task routes
         this.app.use(this.paths.tasks,taskRoutes);
     }
 
