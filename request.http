@@ -13,8 +13,8 @@ POST http://localhost:9090/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "Anakin@darth.com",
-    "password": "obipadme"
+    "email": "admin@admin.com",
+    "password": "123456"
 }
 
 
@@ -96,3 +96,7 @@ x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJlODhmZjVjZC1mYzljLTQ3M2
 ### Eliminar Tarea como User (debe fallar)
 DELETE http://localhost:9090/api/tasks/696678c49cc53ddaad0013cf
 x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMzYtYmI2ZC05NDNhZjUzODIwMDIiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4MzM5NzU1LCJleHAiOjE3NjgzNTQxNTV9.VHab5Z6-Ound2SFF6fpRZM7ZtWF24ySQNCjKAlCbbGA
+
+###Lanzar Seeder
+POST http://localhost:9090/api/tasks/seed
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIyOTVkZDI1MC05YzhlLTQyOTAtYTYxMS0wZjVhNGYyMTUyZmEiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODM0MzkzNiwiZXhwIjoxNzY4MzU4MzM2fQ.ES-2fZbNuROTr27nN9cKpyyWmGHAfFNDYWfaxqRRe1I

@@ -4,6 +4,7 @@ import {validateFields} from '../middlewares/validateFields.js';
 import {validateJWT} from '../middlewares/validate-jwt.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
 import {createTask,getTasks,assignTask,changeStatus,releaseTask,takeTask, deleteTask} from '../controllers/taskController.js';
+import { executeSeed } from '../controllers/seedController.js';
 
 const router = Router();
 
@@ -88,5 +89,15 @@ router.delete('/:id',[
     check('id', 'No es un id válido').isMongoId(),
     validateFields
 ],deleteTask);
+
+/**
+ * Seed repoblar bbdd
+ * access - solo admin
+ */
+
+router.post('/seed',[
+    validateJWT,
+    isAdmin
+],executeSeed);
 
 export default router;
