@@ -23,8 +23,8 @@ POST http://localhost:9090/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "sergio@sergio.com",
-    "password": "aaaaaaaa"
+    "email": "ssuper@visor.com",
+    "password": "123456"
 }
 
 
@@ -111,3 +111,74 @@ x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYT
     "description": "Intento de hackeo",
     "difficulty": "L"
 }
+
+@url = http://localhost:9090
+
+
+### 1.1 Registro Normal (Debe funcionar y devolver Token)
+# Prueba de fuego: Intentamos inyectar "ADMIN_ROLE".
+# RESULTADO ESPERADO: Crea el usuario, PERO ignora el rol Admin y le pone USER_ROLE.
+POST {{url}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Pepe Hacker",
+  "email": "pepe@hacker.com",
+  "password": "password123",
+  "roles": ["ADMIN_ROLE"]
+}
+
+
+### ------------------------------------------------------------------------
+### GESTIÓN DE USUARIOS (Solo Admin)
+### 
+### ------------------------------------------------------------------------
+
+### Crear Usuario Admin
+
+POST {{url}}/api/users
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODQzMDYzMCwiZXhwIjoxNzY4NTc0NjMwfQ.CwBYLqXo5l-LjCrAUCV1SItWTCgTideL8WoB6m8VooQ
+
+{
+  "name": "Nuevo Supervisor 2 ",
+  "email": "ssuper@visor.com",
+  "password": "123456",
+  "roles": ["ADMIN_ROLE", "USER_ROLE"]
+}
+
+### Listar Todos los Usuarios
+
+GET {{url}}/api/users
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODQzMDYzMCwiZXhwIjoxNzY4NTc0NjMwfQ.CwBYLqXo5l-LjCrAUCV1SItWTCgTideL8WoB6m8VooQ
+
+### Obtener Usuario por ID
+
+GET {{url}}/api/users/69681cf47fecd8bbeef065ad
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODQzMDYzMCwiZXhwIjoxNzY4NTc0NjMwfQ.CwBYLqXo5l-LjCrAUCV1SItWTCgTideL8WoB6m8VooQ
+
+### Actualizar Usuario
+
+PUT {{url}}/api/users/6968209fd03ed47c6fe7f457
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODQzMDYzMCwiZXhwIjoxNzY4NTc0NjMwfQ.CwBYLqXo5l-LjCrAUCV1SItWTCgTideL8WoB6m8VooQ
+
+{
+  "name": "Supervisor2222222",
+  "state": true,
+  "roles": "USER_ROLE" 
+}
+
+### Eliminar Usuario (Soft Delete)
+DELETE {{url}}/api/users/69681cf47fecd8bbeef065ad
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODQzMDYzMCwiZXhwIjoxNzY4NTc0NjMwfQ.CwBYLqXo5l-LjCrAUCV1SItWTCgTideL8WoB6m8VooQ
+
+### ------------------------------------------------------------------------
+### usuario normal intenta entrar
+### 
+### ------------------------------------------------------------------------
+
+### intenta listar usuarios
+# resultado no tiene permisos
+GET {{url}}/api/users
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJjYjQ4YTg5MS05OGM0LTQ4MDYtODNkNS1iZWYwNWMwZDk3NDMiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4NDMyMDI0LCJleHAiOjE3Njg1NzYwMjR9.af32l6w5A3xaej69SGFQBPaE_Em9tsG38o7lWTMEkpM
