@@ -1,5 +1,5 @@
 import { response, request } from 'express';
-import SeedService from '../services/seedService.js';
+import SeedService from '../services/SeedService.js';
 
 const seedService = new SeedService();
 

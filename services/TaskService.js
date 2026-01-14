@@ -144,7 +144,7 @@ class TaskService {
     }
 
     //autoasignar tarea, el usuario coge una tarea que tenga libre
-    // ... métodos anteriores ...
+    
 
   
   async takeTask(taskId, user) {
@@ -170,7 +170,7 @@ class TaskService {
         $push: { tasks: task._id }
       });
 
-      // E. Devolvemos la tarea populada
+      //  Devolvemos la tarea populada
       return await Task.findById(taskId).populate('assignedTo', 'name email');
 
     } catch (error) {
@@ -197,6 +197,29 @@ async deleteTask(taskId,user){
         }
 
         await task.deleteOne();
+    } catch (error) {
+        throw error;
+    }
+}
+
+//put actualizar tareas - solo admin
+async updateTask( taskId,data,user){
+    try {
+        const task = await Task.findById(taskId);
+        if (!task) {
+            throw new Error('TASK_NOT_FOUND');
+        }
+
+        if (!user.roles.includes('ADMIN_ROLE')) {
+            throw new Error('NOT_AUTHORIZED');
+        }
+
+        //{new: true} hace que nos devuelva el objeto ya modificado
+        const updatedTask = await Task.findByIdAndUpdate(taskId,data, {new: true});
+
+        return updatedTask;
+
+
     } catch (error) {
         throw error;
     }

@@ -100,3 +100,14 @@ x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI5Yjg3MGU2Zi05MTY1LTRhMz
 ###Lanzar Seeder
 POST http://localhost:9090/api/tasks/seed
 x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIyOTVkZDI1MC05YzhlLTQyOTAtYTYxMS0wZjVhNGYyMTUyZmEiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODM0MzkzNiwiZXhwIjoxNzY4MzU4MzM2fQ.ES-2fZbNuROTr27nN9cKpyyWmGHAfFNDYWfaxqRRe1I
+
+
+### Editar una tarea - caso éxito - Admin
+PUT http://localhost:9090/api/tasks/6966c991650f94246f7aae14
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODQxMTA0OSwiZXhwIjoxNzY4NTU1MDQ5fQ.w1D8vbny0LSPlLNKuiKOehcQG-IVDCNqO-yEYPvWP8c
+
+{
+    "description": "Intento de hackeo",
+    "difficulty": "L"
+}

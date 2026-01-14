@@ -261,6 +261,46 @@ const deleteTask = async (req = request, res = response) => {
         data:null
     });
 }
+
+//updatear tarea - solo admin
+const updateTask = async (req = request, res = response) => {
+    const { id }= req.params;
+    const user = req.user;
+
+    const {_id, ...data} = req.body; //desectructuro para sacar el _id y evitar que se pueda intentar cambiar
+
+    try {
+        const updatedTask = await taskService.updateTask(id,data,user);
+        return res.status(200).json({
+            success: true,
+            message: 'Tarea actualizada correctamente',
+            data: updatedTask
+        });
+    } catch (error) {
+        console.log(error)
+        if (error.message === 'TASK_NOT_FOUND') {
+            return res.status(404).json({
+                success:false,
+                message: 'La tarea no existe',
+                data:null
+            });
+        }
+
+        if (error.message === 'NOT_AUTHORIZED') {
+            return res.status(403).json({
+                success:false,
+                message: 'Solo el administrador tiene permisos',
+                data:null
+            });
+        }
+
+        return res.status(500).json({
+            success:false,
+            message: 'Error inesperado',
+            data:null
+        });
+    }
+}
 export {
     getTasks,
     createTask,
@@ -268,5 +308,6 @@ export {
     changeStatus,
     releaseTask,
     takeTask,
-    deleteTask
+    deleteTask,
+    updateTask
 }
