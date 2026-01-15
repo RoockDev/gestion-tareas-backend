@@ -1,6 +1,7 @@
 import kleur from "kleur";
 import Task from "../models/Task.js";
 import User from "../models/User.js";
+import { ERROR_CODES } from "../helpers/errorCodes.js";
 
 class TaskService {
     //obtener todas las tareas
@@ -32,18 +33,18 @@ class TaskService {
             //se busca la tarea
             const task = await Task.findById(taskId);
             if (!task) {
-                throw new Error('TASK_NOT_FOUND');
+                throw new Error(ERROR_CODES.TASK_NOT_FOUND);
             }
 
             //se valida si ya esta asignada
             if (task.assignedTo) {
-                throw new Error('TASK_ALREADY_ASSIGNED');
+                throw new Error(ERROR_CODES.TASK_ALREADY_ASSIGNED);
             }
 
             //se busca el usuario
             const user = await User.findById(userId);
             if (!user) {
-                throw new Error('USER_NOT_FOUND')
+                throw new Error(ERROR_CODES.USER_NOT_FOUND)
             }
 
             //se actualiza la tarea
@@ -70,7 +71,7 @@ class TaskService {
         try {
             const task = await Task.findById(taskId);
             if (!task) {
-                throw new Error('TASK_NOT_FOUND');
+                throw new Error(ERROR_CODES.TASK_NOT_FOUND);
             }
             //ahora se comprueba si es admin o user el que la cambia
             //se podria hacer mediante dos middleware pero seria mas ineficiente porque habria 
@@ -83,7 +84,7 @@ class TaskService {
 
             
             if (!isAdmin && !isOwner) {
-                throw new Error('NOT_AUTHORIZED');
+                throw new Error(ERROR_CODES.NOT_AUTHORIZED);
             }
 
             //se verifica el estado actual
@@ -96,7 +97,7 @@ class TaskService {
             }else if(currentStatus !== 'todo' && newStatus === 'todo'){
                 task.status = 'todo';
             }else{
-                throw new Error('INVALID_TRANSITION');
+                throw new Error(ERROR_CODES.INVALID_TRANSITION);
             }
 
             await task.save();
@@ -111,12 +112,12 @@ class TaskService {
         try {
             const task = await Task.findById(taskId);
             if (!task) {
-                throw new Error('TASK_NOT_FOUND');
+                throw new Error(ERROR_CODES.TASK_NOT_FOUND);
             }
 
             //se comprueba si está asignada
             if (!task.assignedTo) {
-                throw new Error('TASK_NOT_ASSIGNED');
+                throw new Error(ERROR_CODES.TASK_NOT_ASSIGNED);
             }
 
             //se valida si es admin o usuario normal
@@ -124,7 +125,7 @@ class TaskService {
             const isOwner = task.assignedTo && task.assignedTo.toString() === user._id.toString();
 
             if (!isAdmin && !isOwner) {
-                throw new Error('NOT_AUTHORIZED');
+                throw new Error(ERROR_CODES.NOT_AUTHORIZED);
             }
 
             //ahora se saca la tarea del array con pull, se busca al usuario que tenia asignada y se le quita
@@ -152,12 +153,12 @@ class TaskService {
      
       const task = await Task.findById(taskId);
       if (!task) {
-        throw new Error('TASK_NOT_FOUND');
+        throw new Error(ERROR_CODES.TASK_NOT_FOUND);
       }
 
       
       if (task.assignedTo) {
-        throw new Error('TASK_ALREADY_ASSIGNED');
+        throw new Error(ERROR_CODES.TASK_ALREADY_ASSIGNED);
       }
 
       
@@ -182,12 +183,12 @@ async deleteTask(taskId,user){
     try {
         const task = await Task.findById(taskId);
         if (!task) {
-            throw new Error('TASK_NOT_FOUND');
+            throw new Error(ERROR_CODES.TASK_NOT_FOUND);
         }
 
         //aunque lo protejamos con el middleware, aqui tambien lo hago + seguridad
         if (!user.roles.includes('ADMIN_ROLE')) {
-            throw new Error('NOT_AUTHORIZED');
+            throw new Error(ERROR_CODES.NOT_AUTHORIZED);
         }
 
         if (task.assignedTo) {
@@ -207,11 +208,11 @@ async updateTask( taskId,data,user){
     try {
         const task = await Task.findById(taskId);
         if (!task) {
-            throw new Error('TASK_NOT_FOUND');
+            throw new Error(ERROR_CODES.TASK_NOT_FOUND);
         }
 
         if (!user.roles.includes('ADMIN_ROLE')) {
-            throw new Error('NOT_AUTHORIZED');
+            throw new Error(ERROR_CODES.NOT_AUTHORIZED);
         }
 
         //{new: true} hace que nos devuelva el objeto ya modificado

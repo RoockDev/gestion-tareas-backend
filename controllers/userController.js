@@ -1,5 +1,6 @@
 import { response, request } from 'express';
 import UserService from '../services/UserService.js';
+import { ERROR_CODES } from '../helpers/errorCodes.js';
 
 const userService = new UserService();
 
@@ -35,7 +36,7 @@ const getUserById = async (req = request, res = response) => {
             data: user
         });
     } catch (error) {
-        if (error.message === 'USER_NOT_FOUND') {
+        if (error.message === ERROR_CODES.USER_NOT_FOUND) {
             return res.status(404).json({ 
                 success:false,
                 message: 'Usuario no encontrado',
@@ -66,7 +67,7 @@ const updateUser = async (req = request, res = response) => {
             data: updatedUser
         });
     } catch (error) {
-        if (error.message === 'USER_NOT_FOUND') {
+        if (error.message === ERROR_CODES.USER_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                 message: 'Usuario no encontrado',
@@ -97,7 +98,7 @@ const createUser = async (req = request, res = response) => {
 
     } catch (error) {
         
-        if (error.message === 'EMAIL_EXISTS') {
+        if (error.message === ERROR_CODES.EMAIL_EXISTS) {
              return res.status(400).json({ 
                 success:false,
                 message: 'El correo ya está registrado',
@@ -125,7 +126,7 @@ const deleteUser = async (req = request, res = response) => {
             data:null
          });
     } catch (error) {
-        if (error.message === 'USER_NOT_FOUND') {
+        if (error.message === ERROR_CODES.USER_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                  message: 'Usuario no encontrado' ,

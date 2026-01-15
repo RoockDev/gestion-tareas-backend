@@ -1,5 +1,6 @@
 import {response, request} from 'express';
 import TaskService from '../services/TaskService.js';
+import { ERROR_CODES } from '../helpers/errorCodes.js';
 
 const taskService = new TaskService();
 
@@ -61,7 +62,7 @@ const assignTask = async (req = request, res = response) => {
         console.log(error);
 
         //manejo de errores especificos definidos en el servicio
-        if (error.message === 'TASK_NOT_FOUND') {
+        if (error.message === ERROR_CODES.TASK_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                 message: 'La tarea no existe',
@@ -69,7 +70,7 @@ const assignTask = async (req = request, res = response) => {
             });
         }
 
-        if (error.message === 'USER_NOT_FOUND') {
+        if (error.message === ERROR_CODES.USER_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                 message: 'El usuario no existe',
@@ -108,21 +109,21 @@ const changeStatus = async (req = request, res = response) => {
         });
     } catch (error) {
         console.log(error);
-        if (error.message === 'TASK_NOT_FOUND') {
+        if (error.message === ERROR_CODES.TASK_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                 message: 'La tarea no existe',
                 data:null
             });
         }
-        if (error.message === 'NOT_AUTHORIZED') {
+        if (error.message === ERROR_CODES.NOT_AUTHORIZED) {
             return res.status(403).json({
                 success:false,
                 message: 'No tienes permisos',
                 data:null
             });
         }
-        if (error.message === 'INVALID_TRANSITION') {
+        if (error.message === ERROR_CODES.INVALID_TRANSITION) {
             return res.status(400).json({
                 success:false,
                 message: 'Cambio de estado no permitido',
@@ -152,7 +153,7 @@ const releaseTask = async (req = request, res = response) => {
             data: releasedTask
         })
     } catch (error) {
-        if (error.message === 'TASK_NOT_FOUND') {
+        if (error.message === ERROR_CODES.TASK_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                 message: 'Tarea no existe',
@@ -160,7 +161,7 @@ const releaseTask = async (req = request, res = response) => {
             });
         }
 
-        if (error.message === 'TASK_NOT_ASSIGNED') {
+        if (error.message === ERROR_CODES.TASK_NOT_ASSIGNED) {
             return res.status(400).json({
                 success:false,
                 message: 'La tarea no está asignada a nadie, no se puede liberar',
@@ -168,7 +169,7 @@ const releaseTask = async (req = request, res = response) => {
             });
         }
 
-        if (error.message === 'NOT_AUTHORIZED') {
+        if (error.message === ERROR_CODES.NOT_AUTHORIZED) {
             return res.status(403).json({
                 success:false,
                 message: 'No tienes permisos para liberar esta tarea',
@@ -199,7 +200,7 @@ const takeTask = async (req = request, res = response) => {
         });
     } catch (error) {
         console.log(error);
-        if (error.message === 'TASK_NOT_FOUND') {
+        if (error.message === ERROR_CODES.TASK_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                 message: ' la tarea no existe',
@@ -207,7 +208,7 @@ const takeTask = async (req = request, res = response) => {
             });
         }
 
-        if (error.message === 'TASK_ALREADY_ASSIGNED') {
+        if (error.message === ERROR_CODES.TASK_ALREADY_ASSIGNED) {
             return res.status(400).json({
                 success:false,
                 message: 'La tarea ya esta asignada',
@@ -239,14 +240,14 @@ const deleteTask = async (req = request, res = response) => {
     } catch (error) {
         console.log(error);
 
-        if (error.message === 'TASK_NOT_FOUND') {
+        if (error.message === ERROR_CODES.TASK_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                 message: 'La tarea no existe',
                 data:null
             });
         }
-        if (error.message === 'NOT_AUTHORIZED') {
+        if (error.message === ERROR_CODES.NOT_AUTHORIZED) {
             return res.status(403).json({
                 success:false,
                 message: 'No tienes permiso para eliminar una tarea',
@@ -278,7 +279,7 @@ const updateTask = async (req = request, res = response) => {
         });
     } catch (error) {
         console.log(error)
-        if (error.message === 'TASK_NOT_FOUND') {
+        if (error.message === ERROR_CODES.TASK_NOT_FOUND) {
             return res.status(404).json({
                 success:false,
                 message: 'La tarea no existe',
@@ -286,7 +287,7 @@ const updateTask = async (req = request, res = response) => {
             });
         }
 
-        if (error.message === 'NOT_AUTHORIZED') {
+        if (error.message === ERROR_CODES.NOT_AUTHORIZED) {
             return res.status(403).json({
                 success:false,
                 message: 'Solo el administrador tiene permisos',

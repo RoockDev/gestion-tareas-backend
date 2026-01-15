@@ -1,17 +1,18 @@
 import bcryptjs from "bcryptjs";
 import User from '../models/User.js';
 import { generateJWT } from "../helpers/generate_jwt.js";
+import { ERROR_CODES } from "../helpers/errorCodes.js";
 
 class AuthService {
     async login(email,password){
         try {
             const user = await User.findOne({email});
             if (!user) {
-                throw new Error('INVALID_CREDENTIALS');
+                throw new Error(ERROR_CODES.INVALID_CREDENTIALS);
             }
 
             if (!user.state) {
-                throw new Error("USER_INACTIVE");
+                throw new Error();
                 
             }
 

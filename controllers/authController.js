@@ -1,7 +1,8 @@
 import {response, request} from 'express';
-import AuthService from '../services/authService.js';
+import AuthService from '../services/AuthService.js';
 import UserService from '../services/UserService.js';
 import { generateJWT } from '../helpers/generate_jwt.js';
+import { ERROR_CODES } from '../helpers/errorCodes.js';
 
 const authService = new AuthService();
 const userService = new UserService();
@@ -25,7 +26,7 @@ const login = async (req = request, res = response) => {
         console.log(error);
 
         //manejo de errores del service
-        if (error.message === 'INVALID_CREDENTIALS' || error.message === 'USER_INACTIVE') {
+        if (error.message === ERROR_CODES.INVALID_CREDENTIALS || error.message === ERROR_CODES.USER_INACTIVE) {
             return res.status(400).json({
                 success:false,
                 message: 'Usuario o Contraseña incorrectos',
@@ -74,7 +75,7 @@ const register = async (req = request, res = response) => {
         })
     } catch (error) {
         console.log(error);
-       if(error.message === 'EMAIL_EXIST'){
+       if(error.message === ERROR_CODES.EMAIL_EXISTS){
         return res.status(400).json({
             success:false,
             message: 'El correo ya está registrado',

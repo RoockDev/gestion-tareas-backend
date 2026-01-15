@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import { v4 as uuidv4 } from "uuid";
 import bcryptjs from "bcryptjs";
 import kleur from "kleur";
+import { ERROR_CODES } from "../helpers/errorCodes.js";
 
 class UserService {
   constructor() {}
@@ -44,7 +45,7 @@ class UserService {
       } catch (error) {
           //en el modelo , en mongo esta email unique pero si mongo explota por eso, se lanza error 11000 y asi controlamos y vale para enviarlo a los dos controladores que usan este servicio
           if (error.code === 11000) {
-              throw new Error('EMAIL_EXISTS');
+              throw new Error(ERROR_CODES.EMAIL_EXISTS);
           }
           throw error; 
       }
@@ -77,7 +78,7 @@ class UserService {
     try {
       const user = await User.findById(id);
       if (!user || !user.state) {
-        throw new Error('USER_NOT_FOUND');
+        throw new Error(ERROR_CODES.USER_NOT_FOUND);
       }
       return user;
     } catch (error) {
@@ -99,7 +100,7 @@ class UserService {
 
         const user = await User.findByIdAndUpdate(id,data, {new:true});
         if(!user) {
-          throw new Error('USER_NOT_FOUND');
+          throw new Error(ERROR_CODES.USER_NOT_FOUND);
         }
 
         return user;
@@ -114,7 +115,7 @@ class UserService {
       // no borramos el registro solo ponemos el state en false
       const user = await User.findByIdAndUpdate(id,{state:false}, {new:true});
       if(!user){
-        throw new Error('USER_NOT_FOUND');
+        throw new Error(ERROR_CODES.USER_NOT_FOUND);
       }
       return user;
     } catch (error) {
