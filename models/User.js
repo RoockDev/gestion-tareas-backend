@@ -44,7 +44,7 @@ const userSchema = new Schema({
 //metodo para limpiar el objeto al devolverlo (por seguridad)
 //para no enviar por ejemplo contraseñas encriptada ya que seria un fallo grande
 userSchema.methods.toJSON = function() {
-    const {_v,_id,password,...user} = this.toObject();
+    const {_v,password,...user} = this.toObject();
     return user; 
 }
 

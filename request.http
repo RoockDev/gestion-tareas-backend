@@ -182,3 +182,23 @@ x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYT
 # resultado no tiene permisos
 GET {{url}}/api/users
 x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJjYjQ4YTg5MS05OGM0LTQ4MDYtODNkNS1iZWYwNWMwZDk3NDMiLCJyb2xlcyI6WyJVU0VSX1JPTEUiXSwiaWF0IjoxNzY4NDMyMDI0LCJleHAiOjE3Njg1NzYwMjR9.af32l6w5A3xaej69SGFQBPaE_Em9tsG38o7lWTMEkpM
+
+
+### Obtener las tareas por rango de dificultad
+GET http://localhost:9090/api/tasks/range?min=m&max=xl
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODY0NDE0OSwiZXhwIjoxNzY4Nzg4MTQ5fQ.urHajg2mdbCM-J3sxpU7IanUPdhDKRRVCLt8LqXKjD0
+
+
+### obtener tarea de mayor dificultad numero
+
+GET http://localhost:9090/api/tasks/stats/max-difficulty
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODY0NDE0OSwiZXhwIjoxNzY4Nzg4MTQ5fQ.urHajg2mdbCM-J3sxpU7IanUPdhDKRRVCLt8LqXKjD0
+
+
+### obtener todas las tareas por un estado - solo admin
+
+GET http://localhost:9090/api/tasks/filter/status?status=doing
+Content-Type: application/json
+x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJiOGNlZWEwYy04MzhlLTRjYTQtOGU0YS04YzA5YTM3YjIwNjIiLCJyb2xlcyI6WyJBRE1JTl9ST0xFIiwiVVNFUl9ST0xFIl0sImlhdCI6MTc2ODY0NDE0OSwiZXhwIjoxNzY4Nzg4MTQ5fQ.urHajg2mdbCM-J3sxpU7IanUPdhDKRRVCLt8LqXKjD0

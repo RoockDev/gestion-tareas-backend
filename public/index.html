@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor de Tareas (Test)</title>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="http://localhost:9091/socket.io/socket.io.js"></script>
+    <style>
+      body {
+        font-family: "Courier New", monospace;
+        padding: 20px;
+        background-color: #eee;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #333;
+      }
+      .hidden {
+        display: none;
+      }
+      .box {
+        border: 2px solid #000;
+        padding: 15px;
+        margin-bottom: 20px;
+        background: white;
+        box-shadow: 4px 4px 0px #000;
+      }
+      .btn {
+        cursor: pointer;
+        padding: 8px 12px;
+        background: #ddd;
+        border: 2px solid #000;
+        font-weight: bold;
+      }
+      .btn:active {
+        transform: translate(2px, 2px);
+      }
+      .btn-red {
+        background: #ffcccc;
+      }
+      .btn-green {
+        background: #ccffcc;
+      }
+      .row {
+        display: flex;
+        gap: 20px;
+      }
+      .col {
+        flex: 1;
+        min-width: 300px;
+      }
+
+      .task-card {
+        border: 1px solid #666;
+        padding: 10px;
+        margin: 10px 0;
+        background: #fff;
+        position: relative;
+      }
+      .task-card.priority-XL {
+        border-left: 10px solid red;
+      }
+      .task-card.priority-S {
+        border-left: 10px solid green;
+      }
+
+      .error {
+        color: red;
+        font-weight: bold;
+      }
+      input,
+      select {
+        padding: 5px;
+        border: 1px solid #000;
+        margin-bottom: 5px;
+        width: 90%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🛠️ Cliente de Pruebas (API)</h1>
+
+    <div id="auth-section" class="box">
+      <div id="login-form">
+        <h2>Iniciar Sesión</h2>
+        <input
+          type="text"
+          id="email"
+          placeholder="Email"
+          value="admin@admin.com"
+        />
+        <input
+          type="password"
+          id="password"
+          placeholder="Contraseña"
+          value="123456"
+        />
+        <br /><br />
+        <button onclick="login()" class="btn btn-green">Entrar</button>
+        <button onclick="toggleAuth()" class="btn">Ir a Registro</button>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
+
+<div id="g_id_onload"
+    data-client_id="257893254587-medp1loqefmagtfamj07atok824se2ic.apps.googleusercontent.com"
+    data-auto_prompt="false"
+    data-callback="handleCredentialResponse">
+</div>
+
+<div class="g_id_signin"
+    data-type="standard"
+    data-size="large"
+    data-theme="outline"
+    data-text="sign_in_with"
+    data-shape="rectangular"
+    data-logo_alignment="left">
+</div>
+      </div>
+
+      <div id="register-form" class="hidden">
+        <h2>Registro Nuevo Usuario</h2>
+        <input type="text" id="reg-name" placeholder="Nombre" />
+        <input type="text" id="reg-email" placeholder="Email" />
+        <input
+          type="password"
+          id="reg-password"
+          placeholder="Contraseña (>6 letras)"
+        />
+        <br /><br />
+        <button onclick="register()" class="btn btn-green">Registrarse</button>
+        <button onclick="toggleAuth()" class="btn">Volver a Login</button>
+      </div>
+      <p id="auth-error" class="error"></p>
+    </div>
+
+    <div id="dashboard-section" class="hidden">
+      <div
+        class="box"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div>
+          <strong>Usuario:</strong> <span id="user-name">...</span> |
+          <strong>Rol:</strong> <span id="user-role">...</span>
+        </div>
+        <button onclick="logout()" class="btn btn-red">Salir</button>
+      </div>
+      <div
+        id="admin-seed-box"
+        class="box hidden"
+        style="border: 4px solid black; background-color: #ffe6e6"
+      >
+        <h3 style="color: red; text-transform: uppercase">
+          ☢️ ZONA DE PELIGRO: RESETEAR BASE DE DATOS (SEED)
+        </h3>
+
+        <p>
+          <strong>⚠️ ADVERTENCIA:</strong> Al pulsar el botón se
+          <strong>BORRARÁ TODA LA BASE DE DATOS</strong> (Usuarios y Tareas) y
+          se volverá a poblar con datos de prueba (5 Usuarios y 20 Tareas).
+        </p>
+
+        <div
+          style="
+            background: white;
+            padding: 10px;
+            border: 1px solid red;
+            margin: 10px 0;
+          "
+        >
+          <p style="margin-top: 0">
+            <strong>📝 Credenciales Generadas (Para volver a entrar):</strong>
+          </p>
+          <ul style="list-style-type: none; padding: 0">
+            <li>
+              👤 <strong>Admin:</strong> <code>admin@admin.com</code> | Pass:
+              <code>123456</code>
+            </li>
+            <li>
+              👤 <strong>User:</strong> <code>user@user.com</code> | Pass:
+              <code>123456</code>
+            </li>
+          </ul>
+        </div>
+
+        <button
+          onclick="executeSeed()"
+          class="btn"
+          style="
+            background-color: black;
+            color: white;
+            font-weight: bold;
+            width: 100%;
+            padding: 10px;
+          "
+        >
+          ☢️ EJECUTAR SEED (BORRAR Y REPOBLAR)
+        </button>
+      </div>
+
+      <div class="box" style="background-color: #e8f4f8">
+        <h3>📡 Panel en Tiempo Real</h3>
+        <p>
+          Tareas sin asignar:
+          <strong id="socket-counter" style="font-size: 24px">0</strong>
+        </p>
+      </div>
+
+      <div id="admin-panel" class="box hidden" style="border-color: red">
+        <h3 style="color: red; margin-top: 0">👑 Solo Admin: Crear Tarea</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <input
+            type="text"
+            id="new-desc"
+            placeholder="Descripción"
+            style="flex: 2"
+          />
+          <select id="new-diff" style="flex: 1">
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M" selected>M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+          </select>
+          <input
+            type="number"
+            id="new-dur"
+            placeholder="Minutos"
+            value="60"
+            style="flex: 1"
+          />
+          <button onclick="createTask()" class="btn">Crear</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col box">
+          <h3>🆓 Disponibles (Para coger)</h3>
+          <button onclick="loadTasks()" class="btn">🔄 Refrescar</button>
+          <div id="list-free"></div>
+        </div>
+
+        <div class="col box">
+          <h3>👤 Mis Tareas (Asignadas)</h3>
+          <div id="list-mine"></div>
+        </div>
+      </div>
+
+      <div id="admin-list-section" class="box hidden">
+        <h3>👁️ Visión Global (Todas)</h3>
+        <div id="list-all"></div>
+      </div>
+    </div>
+    <div
+      id="admin-filter-box"
+      class="box hidden"
+      style="border: 4px solid blue; background-color: #eef"
+    >
+      <h3 style="color: blue">
+        🕵️‍♂️ Admin: Filtrar tareas por estado (Endpoint /filter/status)
+      </h3>
+
+      <p>Selecciona qué quieres ver:</p>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px">
+        <button onclick="filterByStatus('todo')" class="btn">📝 TODO</button>
+        <button onclick="filterByStatus('doing')" class="btn">⚙️ DOING</button>
+        <button onclick="filterByStatus('done')" class="btn">✅ DONE</button>
+      </div>
+
+      <div
+        id="filter-results"
+        style="
+          border: 1px dashed blue;
+          padding: 10px;
+          background: white;
+          min-height: 50px;
+        "
+      >
+        <small>Los resultados aparecerán aquí...</small>
+      </div>
+    </div>
+    <div
+      id="admin-stats-box"
+      class="box hidden"
+      style="border: 4px solid orangered; background-color: #fff5e6"
+    >
+      <h3 style="color: orangered">
+        📊 Admin: Estadísticas de Máxima Dificultad
+      </h3>
+
+      <p>
+        Consulta cuál es el nivel de dificultad más alto presente en el sistema
+        ahora mismo:
+      </p>
+
+      <button
+        onclick="getDifficultyStats()"
+        class="btn"
+        style="background-color: orangered; color: white; font-weight: bold"
+      >
+        🔍 Consultar Máxima Dificultad
+      </button>
+
+      <div
+        id="stats-results"
+        style="
+          margin-top: 15px;
+          padding: 10px;
+          border: 1px dashed orangered;
+          background: white;
+          font-size: 1.1em;
+        "
+      >
+        <small>Dale al botón para calcular...</small>
+      </div>
+    </div>
+    <div
+      id="admin-range-box"
+      class="box hidden"
+      style="border: 4px solid purple; background-color: #fceeff"
+    >
+      <h3 style="color: purple">📉 Admin: Filtrar por Rango de Dificultad</h3>
+
+      <p>Selecciona el rango (ej: de 'S' a 'L'):</p>
+
+      <div
+        style="
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          margin-bottom: 15px;
+        "
+      >
+        <label>Mínimo:</label>
+        <select id="range-min">
+          <option value="XS">XS</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+        </select>
+
+        <label>Máximo:</label>
+        <select id="range-max">
+          <option value="XS">XS</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L" selected>L</option>
+          <option value="XL">XL</option>
+        </select>
+
+        <button
+          onclick="getTasksByRange()"
+          class="btn"
+          style="background-color: purple; color: white"
+        >
+          🔍 Filtrar
+        </button>
+      </div>
+
+      <div
+        id="range-results"
+        style="
+          border: 1px dashed purple;
+          padding: 10px;
+          background: white;
+          min-height: 50px;
+        "
+      >
+        <small>Los resultados aparecerán aquí...</small>
+      </div>
+    </div>
+    <div
+      id="admin-assign-box"
+      class="box hidden"
+      style="border: 4px solid teal; background-color: #e0f7fa"
+    >
+      <h3 style="color: teal">👮‍♂️ Admin: Asignar Tarea a Dedo</h3>
+
+      <p>Elige una tarea y un usuario para forzar la asignación:</p>
+
+      <div
+        style="
+          display: flex;
+          gap: 10px;
+          flex-direction: column;
+          max-width: 500px;
+        "
+      >
+        <label>1. Selecciona la Tarea:</label>
+        <select id="assign-task-select" style="padding: 8px">
+          <option value="">Cargando tareas...</option>
+        </select>
+
+        <label>2. Selecciona el Usuario:</label>
+        <select id="assign-user-select" style="padding: 8px">
+          <option value="">Cargando usuarios...</option>
+        </select>
+
+        <button
+          onclick="forceAssignTask()"
+          class="btn"
+          style="background-color: teal; color: white; margin-top: 10px"
+        >
+          🔗 Asignar Tarea
+        </button>
+      </div>
+
+      <p id="assign-result" style="font-weight: bold; margin-top: 10px"></p>
+    </div>
+    <div
+      id="admin-edit-box"
+      class="box hidden"
+      style="border: 4px solid navy; background-color: #e6e6ff"
+    >
+      <h3 style="color: navy">✏️ Admin: Editar Tarea Completa (PUT)</h3>
+      <p>Selecciona una tarea para cargar sus datos, modifícalos y guarda.</p>
+
+      <label><strong>1. Elige Tarea a Editar:</strong></label>
+      <select
+        id="edit-task-select"
+        onchange="fillEditForm()"
+        style="width: 100%; padding: 8px; margin-bottom: 15px"
+      >
+        <option value="">-- Cargando tareas... --</option>
+      </select>
+
+      <div style="background: white; padding: 15px; border: 1px dashed navy">
+        <label>Descripción:</label>
+        <input type="text" id="edit-desc" placeholder="Descripción" />
+
+        <div style="display: flex; gap: 10px">
+          <div style="flex: 1">
+            <label>Dificultad:</label>
+            <select id="edit-diff">
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+            </select>
+          </div>
+          <div style="flex: 1">
+            <label>Duración (min):</label>
+            <input type="number" id="edit-dur" />
+          </div>
+          <div style="flex: 1">
+            <label>Estado (Cuidado):</label>
+            <select id="edit-status">
+              <option value="todo">TODO</option>
+              <option value="doing">DOING</option>
+              <option value="done">DONE</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          onclick="updateTaskFull()"
+          class="btn"
+          style="
+            background-color: navy;
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+          "
+        >
+          💾 GUARDAR CAMBIOS (PUT)
+        </button>
+      </div>
+
+      <p id="edit-result" style="margin-top: 10px; font-weight: bold"></p>
+    </div>
+
+    <div
+      id="admin-users-box"
+      class="box hidden"
+      style="border: 4px solid #2f4f4f; background-color: #f0f8ff"
+    >
+      <h3 style="color: #2f4f4f">👥 CRUD de Usuarios (Administrador)</h3>
+
+      <div
+        style="
+          background: #e6ecec;
+          padding: 15px;
+          border: 1px dashed #2f4f4f;
+          margin-bottom: 20px;
+        "
+      >
+        <h4 style="margin-top: 0">Alta / Edición de Usuario</h4>
+
+        <input type="hidden" id="crud-user-id" />
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <input
+            type="text"
+            id="crud-name"
+            placeholder="Nombre completo"
+            style="flex: 1"
+          />
+          <input
+            type="text"
+            id="crud-email"
+            placeholder="Email"
+            style="flex: 1"
+          />
+          <input
+            type="text"
+            id="crud-password"
+            placeholder="Contraseña (Min 6 chars)"
+            style="flex: 1"
+          />
+        </div>
+
+        <div style="margin-top: 10px; display: flex; gap: 10px">
+          <button
+            onclick="saveUserAdmin()"
+            class="btn"
+            style="background-color: #2f4f4f; color: white; flex: 2"
+          >
+            💾 Guardar Usuario (POST/PUT)
+          </button>
+          <button
+            onclick="resetUserForm()"
+            class="btn"
+            style="background-color: #999; color: white; flex: 1"
+          >
+            🧹 Limpiar
+          </button>
+        </div>
+        <p id="crud-message" style="font-weight: bold"></p>
+      </div>
+
+      <h4>Lista de Usuarios Activos (GET /)</h4>
+      <button
+        onclick="loadAdminUsers()"
+        class="btn"
+        style="margin-bottom: 10px"
+      >
+        🔄 Refrescar Lista
+      </button>
+
+      <div id="crud-users-list">Cargando...</div>
+    </div>
+    <div
+      id="admin-filters-lab"
+      class="box hidden"
+      style="border: 4px solid #8b4513; background-color: #fffaf0"
+    >
+      <h3 style="color: #8b4513">🧪 Las 4 consultas con GraphQL</h3>
+      <div
+        style="
+          background: #ffffcc;
+          padding: 5px;
+          border: 1px solid #e6b800;
+          font-size: 0.9em;
+          margin-bottom: 10px;
+        "
+      >
+        <strong>⚠️ Nota para Fernando:</strong>
+        Aunque algunos de estos endpoints son <strong>Públicos</strong> (ej:
+        Filtrar Dificultad), que los puse así por que estuve probando con los ejemplos
+        que dimos en clase,  he colocado los 4 endpoints que he hecho con graphQL en el Panel de Admin
+        para probarlos aqui
+        porque necesito cargar el listado de usuarios (<code>GET /users</code>)
+        para llenar los selectores, y esa ruta sí es exclusiva de Administrador.
+      </div>
+
+      <p>Prueba los endpoints específicos de filtrado:</p>
+
+      <div
+        style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap"
+      >
+        <div style="flex: 1; min-width: 200px">
+          <label>Usuario Objetivo:</label>
+          <select id="lab-user-select" style="width: 100%; padding: 5px">
+            <option value="">-- Elige Usuario --</option>
+          </select>
+        </div>
+
+        <div style="flex: 1; min-width: 200px">
+          <label>Dificultad Objetivo:</label>
+          <select id="lab-diff-select" style="width: 100%; padding: 5px">
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+        <button
+          onclick="labFilterDifficulty()"
+          class="btn"
+          style="background: #d2691e; color: white"
+        >
+          1️⃣ Solo Dificultad
+        </button>
+
+        <button
+          onclick="labFilterUser()"
+          class="btn"
+          style="background: #a0522d; color: white"
+        >
+          2️⃣ Solo Usuario
+        </button>
+
+        <button
+          onclick="labFilterUserAndDiff()"
+          class="btn"
+          style="background: #800000; color: white"
+        >
+          3️⃣ Usuario + Dificultad
+        </button>
+
+        <button
+          onclick="labFilterUnassigned()"
+          class="btn"
+          style="background: #cd853f; color: white"
+        >
+          4️⃣ Sin Asignar
+        </button>
+      </div>
+
+      <div
+        id="lab-results"
+        style="
+          margin-top: 15px;
+          border: 1px dashed #8b4513;
+          padding: 10px;
+          background: white;
+        "
+      >
+        <small>Los resultados del laboratorio saldrán aquí...</small>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>

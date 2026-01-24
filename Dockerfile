@@ -7,8 +7,8 @@ WORKDIR /usr/src/app
 # Copia package.json y package-lock.json
 COPY package*.json ./
 
-# Instala dependencias
-RUN npm install
+# Instala dependencias --legacy-peer-deps porque tengo un conflicto con una version 5 de express y la 4 y si no lo añado al final no me deja instalar nada
+RUN npm install --legacy-peer-deps 
 
 # Copia todo el proyecto
 COPY . .

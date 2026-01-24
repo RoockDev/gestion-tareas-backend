@@ -226,7 +226,148 @@ async updateTask( taskId,data,user){
     }
 }
 
+//Metodos para Graphql son reutilizables para rest pero son los que voy a hacer con gql en este ejercicio
+//obtener tareas por dificultad especifica
+async getTasksByDifficulty(difficultyLevel){
+    try {
+        const validDifficulties = ['XS','S','M','L','XL'];
+        if (!validDifficulties.includes(difficultyLevel)) {
+            throw new Error(`Dificultad no válida. Permitidas : ${validDifficulties}`);
+        }
+
+        const task = await Task.find({difficulty: difficultyLevel}).populate('assignedTo','name email');
+        return task;
+    } catch (error) {
+        console.log(kleur.red('Error en taskService getTasksByDifficulty'));
+            throw error;
+    }
 }
+
+//Tareas sin aignar, ordenadas por duracion y dificultad
+async getUnassignedTasks() {
+        try {
+            
+            const tasks = await Task.find({ 
+                $or: [
+                    { assignedTo: null },
+                    { assignedTo: { $exists: false } }
+                ] 
+            })
+            // .sort de Mongoose
+            // 1 = Ascendente, -1 = Descendente
+            .sort({ duration: 1, difficulty: 1 }); 
+
+            return tasks;
+        } catch (error) {
+            console.log(kleur.red('Error en taskService getUnassignedTasks'));
+            console.error(error); 
+            throw error;
+        }
+    }
+//Tareas asignadas a un usuario específico
+async getTasksByUserId(userId){
+    try {
+        const tasks = await Task.find({assignedTo: userId}).populate('assignedTo', 'name email');
+        return tasks;
+    } catch (error) {
+        console.log(kleur.red('Error en taskService getTasksByUserId'));
+            throw error;
+    }
+}
+
+//tareas de un usuario filtradas por dificultad
+async getTasksByUserAndDifficulty(userId,difficultyLevel){
+    try {
+        const validDifficulties = ['XS', 'S', 'M', 'L', 'XL'];
+        if (!validDifficulties.includes(difficultyLevel)) {
+            throw new Error(`Dificultad inválida. Permitidas: ${validDifficulties.join(', ')}`);
+        }
+        const tasks = await Task.find({assignedTo: userId,difficulty:difficultyLevel}).populate('assignedTo', 'name email');
+        return tasks;
+    } catch (error) {
+        console.log(kleur.red('Error en taskService getTasksByUserAndDifficulty'));
+        throw error;
+    }
+}
+
+//obtener tareas en un rango de dificultad
+async getTasksByRange(min,max){
+    try {
+         const minLevel = min.toUpperCase();
+         const maxLevel = max.toUpperCase();
+
+         const levels = ['XS', 'S', 'M', 'L', 'XL'];
+
+
+         const minIndex = levels.indexOf(minLevel);
+         const maxIndex = levels.indexOf(maxLevel);
+
+         if (minIndex === -1 || maxIndex === -1) {
+            throw new Error('Dificultad no válida');
+         }
+
+         if (minIndex > maxIndex) {
+            throw new Error('El rango mínimo no puede ser mayor que el máximo');
+         }
+
+         //se sacan las dificultados intermedias
+         const allowedDifficulties = levels.slice(minIndex,maxIndex + 1);
+
+         const tasks = await Task.find({
+            difficulty: {$in: allowedDifficulties}
+         });
+
+         // la ordenación
+         tasks.sort((a,b) => {
+            const indexA = levels.indexOf(a.difficulty);
+            const indexB = levels.indexOf(b.difficulty);
+            return indexA - indexB;
+         });
+
+         return tasks;
+    } catch (error) {
+        console.error(error);
+        throw new Error(error.message || 'Error en el servicio de rangos');
+    }
+}
+
+async countMaxDifficultyTasks(){
+    try {
+        const levels = ['XL', 'L', 'M', 'S', 'XS'];
+
+        for(const level of levels){
+            const count = await Task.countDocuments({difficulty:level});
+
+            if (count > 0) {
+                return {
+                    level: level,
+                    count: count
+                };
+            }
+        }
+
+        return {
+            level:null,
+            count: 0
+        };
+    } catch (error) {
+        console.log(error);
+        throw new Error('Error al contar tareas de alta dificultad');
+    }
+}
+
+async getTasksByStatus(status) {
+    try {
+        const tasks = await Task.find({status:status});
+        return tasks;
+    } catch (error) {
+        console.log(error);
+        throw new Error('Error al filtrar por estado');
+    }
+}
+}
+
+
 
 
 

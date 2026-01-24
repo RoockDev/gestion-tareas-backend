@@ -1,13 +1,33 @@
 import {response, request} from 'express';
 import TaskService from '../services/TaskService.js';
 import { ERROR_CODES } from '../helpers/errorCodes.js';
+import kleur from 'kleur';
 
+//Dejo todos los console.log con los iconos para ir viendo en la terminal de vscode que todo va funcionando bien si no me lio mucho y no se que funciona y que no
 const taskService = new TaskService();
+const REDIS_KEY_TASKS = "tasks_all";
 
 //Obtener todas las tareas
-const getTasks = async (req = request, res = response) => {
+const getTasks = async (req = request, res = response,redisClient) => {
     try {
+
+        if (redisClient) {
+            const cachedTasks = await redisClient.get(REDIS_KEY_TASKS);
+            if (cachedTasks) {
+                console.log(kleur.green(`🟢 Cache de tareas usado`));
+                return res.status(200).json({
+                    success: true,
+                    message: 'Listado de tareas (Desde Caché)',
+                    data: JSON.parse(cachedTasks)
+                });
+            }
+        }
         const tasks = await taskService.getTasks();
+
+        if (redisClient) {
+            await redisClient.setEx(REDIS_KEY_TASKS, 60, JSON.stringify(tasks));
+            console.log(kleur.blue(`🔵 Tareas obtenidas de BD y guardadas en Caché`));
+        }
 
         return res.status(200).json({
             success: true,
@@ -25,10 +45,22 @@ const getTasks = async (req = request, res = response) => {
 }
 
 //Crear Tarea
-const createTask = async (req = request, res = response) => {
+const createTask = async (req = request, res = response,redisClient) => {
     try {
+
+        
         //se le pasa el body entero
         const newTask = await taskService.createTask(req.body);
+
+        req.io.emit('server:loadTasks', {
+            msg: 'Nueva tarea creada',
+            data: newTask
+        }) ;
+
+        if (redisClient) {
+            await redisClient.del(REDIS_KEY_TASKS);
+            console.log(kleur.yellow(`🧹 Caché de tareas limpiada por creación`));
+        }
 
         return res.status(201).json({
             success:true,
@@ -46,12 +78,19 @@ const createTask = async (req = request, res = response) => {
 }
 
 //Asignar Tareas - Solo Admin
-const assignTask = async (req = request, res = response) => {
+const assignTask = async (req = request, res = response,redisClient) => {
     const { id } = req.params; //id tarea
     const {userId} = req.body;
 
     try {
        const taskWithUser = await taskService.assignTask(id,userId);
+
+       req.io.emit('server:loadTasks', { msg: 'Tarea asignada manualmente', data: taskWithUser });
+
+       if (redisClient) {
+            await redisClient.del(REDIS_KEY_TASKS);
+            console.log(kleur.yellow(`🧹 Caché de tareas limpiada por assignacion`));
+        }
        
        return res.status(200).json({
         success:true,
@@ -95,13 +134,21 @@ const assignTask = async (req = request, res = response) => {
 }
 
 //Cambiar estado de una tarea
-const changeStatus = async (req = request, res = response) => {
+const changeStatus = async (req = request, res = response,redisClient) => {
     const {id} = req.params;
     const {status} = req.body;
     const user = req.user;
 
     try {
         const updatedTask = await taskService.changeStatus(id,status,user);
+
+        req.io.emit('server:loadTasks', { msg: 'Estado de tarea actualizado', data: updatedTask });
+
+        if (redisClient) {
+            await redisClient.del(REDIS_KEY_TASKS);
+            console.log(kleur.yellow(`🧹 Caché de tareas limpiada por cambio estado`));
+        }
+
         return res.status(200).json({
             success:true,
             message: `Estado actualizado a ${status}`,
@@ -140,12 +187,19 @@ const changeStatus = async (req = request, res = response) => {
 }
 
 //Liberar una tarea
-const releaseTask = async (req = request, res = response) => {
+const releaseTask = async (req = request, res = response,redisClient) => {
     const {id} = req.params;
     const user = req.user;
 
     try {
         const releasedTask = await taskService.releaseTask(id,user);
+
+        req.io.emit('server:loadTasks', { msg: 'Tarea liberada', data: releasedTask });
+
+        if (redisClient) {
+            await redisClient.del(REDIS_KEY_TASKS);
+            console.log(kleur.yellow(`🧹 Caché de tareas limpiada por soltar tarea`));
+        }
 
         return res.status(200).json({
             success: true,
@@ -187,12 +241,20 @@ const releaseTask = async (req = request, res = response) => {
 
 
 //autoasignar una tarea - cualquier usuario logeado
-const takeTask = async (req = request, res = response) => {
+const takeTask = async (req = request, res = response,redisClient) => {
     const {id} = req.params;
     const user = req.user; 
 
     try {
         const task = await taskService.takeTask(id,user);
+
+        req.io.emit('server:loadTasks', { msg: 'Tarea auto-asignada', data: task });
+
+        if (redisClient) {
+            await redisClient.del(REDIS_KEY_TASKS);
+            console.log(kleur.yellow(`🧹 Caché de tareas limpiada por coger tarea`));
+        }
+
         return res.status(200).json({
             success:true,
             message: 'Tarea auto-asignada correctamente',
@@ -226,12 +288,19 @@ const takeTask = async (req = request, res = response) => {
 }
 
 //deletear tarea -solo admin
-const deleteTask = async (req = request, res = response) => {
+const deleteTask = async (req = request, res = response,redisClient) => {
     const { id } = req.params;
     const user = req.user;
 
     try {
         await taskService.deleteTask(id,user);
+
+        req.io.emit('server:loadTasks', { msg: 'Tarea eliminada', data: null });
+
+        if (redisClient) {
+            await redisClient.del(REDIS_KEY_TASKS);
+            console.log(kleur.yellow(`🧹 Caché de tareas limpiada por borrado`));
+        }
         return res.status(200).json({
             success:true,
             message: 'Tarea eliminada permanentemente',
@@ -264,7 +333,7 @@ const deleteTask = async (req = request, res = response) => {
 }
 
 //updatear tarea - solo admin
-const updateTask = async (req = request, res = response) => {
+const updateTask = async (req = request, res = response,redisClient) => {
     const { id }= req.params;
     const user = req.user;
 
@@ -272,6 +341,14 @@ const updateTask = async (req = request, res = response) => {
 
     try {
         const updatedTask = await taskService.updateTask(id,data,user);
+
+        req.io.emit('server:loadTasks', { msg: 'Tarea modificada por admin', data: updatedTask });
+
+        if (redisClient) {
+            await redisClient.del(REDIS_KEY_TASKS);
+            console.log(kleur.yellow(`🧹 Caché de tareas limpiada por por updateo`));
+        }
+        
         return res.status(200).json({
             success: true,
             message: 'Tarea actualizada correctamente',
@@ -302,6 +379,75 @@ const updateTask = async (req = request, res = response) => {
         });
     }
 }
+
+//obtener tareas por rango de dificultad
+const getTasksByDifficultyRange = async (req = request, res = response) => {
+    const {min,max} = req.query;
+    try {
+        const tasks = await taskService.getTasksByRange(min,max);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Operacion exitosa',
+            data: tasks
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message || 'Error al filtrar tareas por rango',
+            data: null
+        });
+    }
+};
+
+//numero de tareas de máxima dificultad
+const getHighDifficultyStats = async (req = request, res = response) => {
+    try {
+        
+        //el servicio devuelve un objeto {level: 'M', count: '5'}
+        const stats = await taskService.countMaxDifficultyTasks();
+
+        return res.status(200).json({
+            success: true,
+            message: 'respuesta exitosa',
+            data: stats
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message: 'Error al obtener stats',
+            data:null
+        });
+    }
+};
+
+const getTasksByStatus = async (req = request, res = response) => {
+    const {status } = req.query;
+
+    try {
+        const tasks = await taskService.getTasksByStatus(status);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Busqueda exitosa',
+            data: {
+                count: tasks.lenght,
+                tasks: tasks
+            }
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            message: 'Error al filtrar por estado',
+            data: null
+        });
+    }
+
+};
+
 export {
     getTasks,
     createTask,
@@ -310,5 +456,8 @@ export {
     releaseTask,
     takeTask,
     deleteTask,
-    updateTask
+    updateTask,
+    getTasksByDifficultyRange,
+    getHighDifficultyStats,
+    getTasksByStatus
 }

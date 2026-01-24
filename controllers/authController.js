@@ -95,7 +95,30 @@ const register = async (req = request, res = response) => {
 
 }
 
+const googleSignIn = async (req,res) => {
+    const {id_token} = req.body;
+
+    try {
+        const {user,token} = await authService.loginGoogle(id_token);
+
+        return res.status(200).json({
+            success:true,
+            message: 'Google Sign-In exitoso',
+            data: { user, token}
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            success:false,
+            message: 'No se pudo verificar con google',
+            data:null
+        });
+    }
+}
+
 export {
     login,
-    register
+    register,
+    googleSignIn
 };

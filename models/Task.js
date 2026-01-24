@@ -23,7 +23,7 @@ const taskSchema = new Schema({
         default: 'todo'
     },
    
-    assignedTo: { //esto tengo que probarlo aun bien
+    assignedTo: { //esto tengo que probarlo aun bien 
         type: Schema.Types.ObjectId,
         ref: 'User', 
         default: null 

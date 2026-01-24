@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import {response, request } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
@@ -53,6 +54,37 @@ const validateJWT = async (req = request, res = response, next) => {
     }
 }
 
+//version GraphQl
+const validarJWT_GQL = async (context) => {
+    const token = context.req.headers['x-token'];
+
+    if (!token) {
+        console.log("❌ Error: No ha llegado ningún token");
+        throw new Error("No hay token en la solicitud.");
+    }
+
+    try {
+        
+        const { uid } = jwt.verify(token, process.env.SECRET_KEY);
+        console.log("3. Token verificado. UID:", uid);
+        const user = await User.findOne({id:uid});
+
+        if (!user) throw new Error("Usuario no existe.");
+        console.log("❌ Error: Usuario no encontrado en DB");
+        if (!user.state) throw new Error("Usuario inhabilitado.");
+        console.log("❌ Error: Usuario inactivo");
+
+        console.log("✅ ÉXITO: Usuario encontrado:", user.name);
+        context.user = user; 
+        
+    } catch (error) {
+        console.log("❌ Error al verificar token:", error.message);
+        throw new Error("Token no válido.");
+    }
+
+    return context; 
+};
 export {
-    validateJWT
+    validateJWT,
+    validarJWT_GQL
 }

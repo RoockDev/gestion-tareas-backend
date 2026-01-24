@@ -4,5 +4,4 @@ import Server from './server.js';
 dotenv.config();
 
 const server = new Server();
-
-server.listen();
+server.start();
